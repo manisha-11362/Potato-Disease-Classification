@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Potato Disease AI</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Tabler Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+      min-height:100vh;
+      overflow-y:auto;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding:20px 10px;
+      background:
+        radial-gradient(circle at top left,#1b4332,#081c15 45%),
+        linear-gradient(135deg,#081c15,#0b1f19);
+      font-family:'Segoe UI',sans-serif;
+      position:relative;
+      color:white;
+    }
+
+    /* Floating Background Icons */
+
+    .floating{
+      position:absolute;
+      color:rgba(255,255,255,0.05);
+      animation:float 7s infinite ease-in-out;
+      z-index:0;
+    }
+
+    .floating:nth-child(1){
+      top:10%;
+      left:8%;
+      font-size:90px;
+    }
+
+    .floating:nth-child(2){
+      bottom:10%;
+      right:8%;
+      font-size:110px;
+      animation-delay:2s;
+    }
+
+    .floating:nth-child(3){
+      top:60%;
+      left:14%;
+      font-size:70px;
+      animation-delay:1s;
+    }
+
+    @keyframes float{
+      0%{
+        transform:translateY(0px) rotate(0deg);
+      }
+      50%{
+        transform:translateY(-18px) rotate(7deg);
+      }
+      100%{
+        transform:translateY(0px) rotate(0deg);
+      }
+    }
+
+    /* Main Card */
+
+    .main-card{
+      width:100%;
+      max-width:500px;
+      background:rgba(255,255,255,0.06);
+      backdrop-filter:blur(14px);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:22px;
+      padding:18px;
+      box-shadow:0 10px 40px rgba(0,0,0,0.45);
+      position:relative;
+      z-index:5;
+    }
+
+    /* Logo Circle */
+
+    .logo-circle{
+      width:100px;
+      height:100px;
+      border-radius:50%;
+      overflow:hidden;
+      margin:auto;
+      border:3px solid #2dc653;
+      box-shadow:0 0 25px rgba(45,198,83,0.5);
+      animation:pulse 2s infinite;
+      background:white;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .logo-circle img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+
+    @keyframes pulse{
+      0%{
+        box-shadow:0 0 0 rgba(45,198,83,0.4);
+      }
+      50%{
+        box-shadow:0 0 25px rgba(45,198,83,0.7);
+      }
+      100%{
+        box-shadow:0 0 0 rgba(45,198,83,0.4);
+      }
+    }
+
+    /* Heading */
+
+    .title{
+      font-size:24px;
+      font-weight:700;
+      margin-top:14px;
+      text-align:center;
+      background:linear-gradient(to right,#b7efc5,#52b788);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+
+    .sub{
+      text-align:center;
+      color:#cfd8dc;
+      font-size:13px;
+      margin-top:6px;
+    }
+
+    /* Upload Box */
+
+    .upload-zone{
+      margin-top:18px;
+      border:2px dashed rgba(255,255,255,0.18);
+      background:rgba(255,255,255,0.04);
+      border-radius:18px;
+      padding:22px 15px;
+      text-align:center;
+      cursor:pointer;
+      transition:0.3s ease;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .upload-zone::before{
+      content:'';
+      position:absolute;
+      width:120%;
+      height:100%;
+      background:linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,0.08),
+        transparent
+      );
+      top:0;
+      left:-120%;
+      transition:0.6s;
+    }
+
+    .upload-zone:hover::before{
+      left:100%;
+    }
+
+    .upload-zone:hover{
+      transform:translateY(-3px);
+      border-color:#52b788;
+      background:rgba(82,183,136,0.08);
+    }
+
+    .upload-icon{
+      font-size:42px;
+      color:#74c69d;
+      margin-bottom:10px;
+    }
+
+    .file-name{
+      text-align:center;
+      margin-top:10px;
+      color:#b7efc5;
+      font-size:13px;
+    }
+
+    /* Predict Button */
+
+    .predict-btn{
+      margin-top:16px;
+      width:100%;
+      background:linear-gradient(135deg,#2dc653,#1b4332);
+      border:none;
+      color:white;
+      padding:12px;
+      border-radius:14px;
+      font-size:15px;
+      font-weight:600;
+      transition:0.3s;
+      box-shadow:0 6px 20px rgba(45,198,83,0.3);
+    }
+
+    .predict-btn:hover{
+      transform:scale(1.01);
+      background:linear-gradient(135deg,#52b788,#2d6a4f);
+    }
+
+    /* Loader */
+
+    .loader-box{
+      display:none;
+      text-align:center;
+      margin-top:16px;
+    }
+
+    .loader-text{
+      margin-top:10px;
+      color:#b7efc5;
+      font-weight:500;
+      font-size:14px;
+      animation:blink 1s infinite;
+    }
+
+    @keyframes blink{
+      0%{opacity:1;}
+      50%{opacity:0.5;}
+      100%{opacity:1;}
+    }
+
+    /* Result */
+
+    .result-card{
+      margin-top:18px;
+      text-align:center;
+      animation:fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn{
+      from{
+        opacity:0;
+        transform:translateY(20px);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
+
+    .result-img{
+      width:100%;
+      max-width:130px;
+      border-radius:16px;
+      border:2px solid rgba(255,255,255,0.1);
+      box-shadow:0 10px 20px rgba(0,0,0,0.4);
+    }
+
+    /* Result Boxes */
+
+    .info-box{
+      background:rgba(255,255,255,0.05);
+      padding:12px;
+      border-radius:14px;
+      margin-top:10px;
+      transition:0.3s;
+      height:100%;
+    }
+
+    .info-box:hover{
+      transform:translateY(-2px);
+      background:rgba(255,255,255,0.08);
+    }
+
+    .info-title{
+      font-size:12px;
+      color:#b0bec5;
+    }
+
+    .info-value{
+      font-size:15px;
+      font-weight:700;
+      margin-top:5px;
+      word-break:break-word;
+    }
+
+    /* Confidence Bar */
+
+    .conf-bar{
+      height:7px;
+      background:rgba(255,255,255,0.1);
+      border-radius:99px;
+      margin-top:10px;
+      overflow:hidden;
+    }
+
+    .conf-fill{
+      height:100%;
+      background:linear-gradient(to right,#95d5b2,#2dc653);
+      border-radius:99px;
+      animation:grow 1s ease;
+    }
+
+    @keyframes grow{
+      from{
+        width:0;
+      }
+    }
+
+    /* Footer */
+
+    .footer{
+      margin-top:12px;
+      text-align:center;
+      color:#95a5a6;
+      font-size:12px;
+    }
+
+    .footer span{
+      color:#74c69d;
+      font-weight:600;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <!-- Floating Background Icons -->
+
+  <i class="ti ti-leaf floating"></i>
+  <i class="ti ti-plant-2 floating"></i>
+  <i class="ti ti-seeding floating"></i>
+
+  <!-- Main Card -->
+
+  <div class="main-card">
+
+    <!-- Logo -->
+
+    <div class="text-center">
+
+      <div class="logo-circle">
+
+        <img
+          src="https://thumbs.dreamstime.com/z/funny-potato-mascot-sunglasses-cdr-269396125.jpg"
+          alt="Potato"
+        >
+
+      </div>
+
+      <h1 class="title">
+        Potato Disease AI
+      </h1>
+
+      <p class="sub">
+        Upload potato leaf image and detect disease instantly using AI
+      </p>
+
+    </div>
+
+    <!-- Form -->
+
+    <form
+      action="/"
+      method="POST"
+      enctype="multipart/form-data"
+      onsubmit="showLoader()"
+    >
+
+      <!-- Upload -->
+
+      <div
+        class="upload-zone"
+        onclick="document.getElementById('file').click()"
+      >
+
+        <i class="ti ti-cloud-upload upload-icon"></i>
+
+        <h5 style="font-weight:600;">
+          Upload Potato Leaf
+        </h5>
+
+        <p style="color:#cfd8dc;font-size:13px;">
+          Click or drag image here
+        </p>
+
+        <input
+          type="file"
+          id="file"
+          name="file"
+          accept=".jpg,.jpeg,.png"
+          required
+          style="display:none;"
+          onchange="showName(this)"
+        >
+
+      </div>
+
+      <!-- File Name -->
+
+      <p id="fname" class="file-name" style="display:none;"></p>
+
+      <!-- Error -->
+
+      {% if message %}
+
+      <div
+        class="alert mt-3"
+        style="
+          background:#3b0d0d;
+          color:#ffb3b3;
+          border:none;
+          border-radius:14px;
+          font-size:13px;
+        "
+      >
+        <i class="ti ti-alert-circle"></i>
+        {{ message }}
+      </div>
+
+      {% endif %}
+
+      <!-- Predict Button -->
+
+      <button type="submit" class="predict-btn">
+        <i class="ti ti-sparkles"></i>
+        Predict Disease
+      </button>
+
+      <!-- Loader -->
+
+      <div id="loader" class="loader-box">
+
+        <div
+          class="spinner-border text-success"
+          style="width:2.5rem;height:2.5rem;"
+        ></div>
+
+        <div class="loader-text">
+          Processing Potato Leaf...
+        </div>
+
+      </div>
+
+    </form>
+
+    <!-- Result -->
+
+    {% if image_path %}
+
+    <div class="result-card">
+
+      <img
+        src="{{ image_path }}"
+        class="result-img"
+      >
+
+      <div class="row mt-2 g-2">
+
+        <!-- Result -->
+
+        <div class="col-6">
+
+          <div class="info-box">
+
+            <div class="info-title">
+              Detected Result
+            </div>
+
+            <div class="info-value">
+              {{ predicted_label }}
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Confidence -->
+
+        <div class="col-6">
+
+          <div class="info-box">
+
+            <div class="info-title">
+              Confidence
+            </div>
+
+            <div class="info-value">
+              {{ confidence }}%
+            </div>
+
+            <div class="conf-bar">
+
+              <div
+                class="conf-fill"
+                style="width:{{ confidence }}%;"
+              ></div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    {% endif %}
+
+    <!-- Footer -->
+
+    <div class="footer">
+      Designed by <span>Manisha Kumari Mehta</span> ✨
+    </div>
+
+  </div>
+
+  <!-- Script -->
+
+  <script>
+
+    function showName(input){
+
+      const el = document.getElementById('fname');
+
+      if(input.files[0]){
+
+        el.innerHTML = `
+          <i class="ti ti-paperclip"></i>
+          ${input.files[0].name}
+        `;
+
+        el.style.display = 'block';
+      }
+    }
+
+    function showLoader(){
+
+      document.getElementById('loader').style.display = 'block';
+    }
+
+  </script>
+
+</body>
+
+</html>
